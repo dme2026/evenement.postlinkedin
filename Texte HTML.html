@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendrier éditorial LinkedIn — DME</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3F6F3;
+    --paper:#FFFFFF;
+    --ink:#142521;
+    --ink-soft:#4B5F5A;
+    --primary:#0E4B43;
+    --mint:#6FBEA3;
+    --mint-bg:#E4F1EB;
+    --coral:#E8674A;
+    --coral-bg:#FBE7E1;
+    --amber:#C08A2E;
+    --amber-bg:#F6ECD8;
+    --blue:#2C6E8C;
+    --blue-bg:#E1EEF3;
+    --line:#DCE4DF;
+    --line-soft:#EAEFEC;
+    --shadow:0 1px 2px rgba(20,37,33,0.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 24px 80px;}
+
+  header.hero{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    flex-wrap:wrap;
+    padding-bottom:22px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:26px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:clamp(28px,4vw,40px);
+    line-height:1.08;
+    margin:0 0 8px;
+    color:var(--primary);
+    letter-spacing:-0.01em;
+  }
+  .hero p{margin:0;color:var(--ink-soft);font-size:15px;max-width:520px;line-height:1.5;}
+  .hero-stats{display:flex;gap:22px;}
+  .stat{text-align:right;}
+  .stat .num{font-family:'Fraunces',serif;font-size:28px;color:var(--primary);display:block;line-height:1;}
+  .stat .label{font-size:12.5px;color:var(--ink-soft);}
+
+  .toolbar{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px 18px;
+    margin-bottom:24px;
+    box-shadow:var(--shadow);
+    position:sticky;
+    top:12px;
+    z-index:20;
+  }
+  .search-row{display:flex;gap:10px;align-items:center;}
+  .search-row input[type=text]{
+    flex:1;
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:9px 12px;
+    font-size:14.5px;
+    font-family:inherit;
+    color:var(--ink);
+    background:var(--bg);
+  }
+  .search-row input[type=text]:focus{outline:2px solid var(--mint);outline-offset:1px;}
+  .add-btn{
+    background:var(--primary);
+    color:#fff;
+    border:none;
+    border-radius:9px;
+    padding:9px 16px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+    white-space:nowrap;
+  }
+  .add-btn:hover{background:#0B3A34;}
+  .chip-rows{display:flex;flex-direction:column;gap:8px;}
+  .chip-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+  .chip-row .row-label{font-size:12px;color:var(--ink-soft);width:52px;flex-shrink:0;}
+  .chip{
+    border:1px solid var(--line);
+    background:var(--bg);
+    color:var(--ink-soft);
+    padding:5px 12px;
+    border-radius:100px;
+    font-size:13px;
+    cursor:pointer;
+    font-family:inherit;
+    transition:all .12s ease;
+  }
+  .chip:hover{border-color:var(--mint);color:var(--ink);}
+  .chip.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+  .month-group{margin-bottom:6px;}
+  .month-head{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    padding:22px 4px 10px;
+  }
+  .month-head .num{font-family:'Fraunces',serif;font-size:26px;color:var(--primary);}
+  .month-head .name{font-size:13px;color:var(--ink-soft);text-transform:lowercase;}
+  .month-head .name::first-letter{text-transform:uppercase;}
+  .month-head .rule{flex:1;height:1px;background:var(--line);}
+
+  table{width:100%;border-collapse:collapse;background:var(--paper);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);}
+  thead th{
+    text-align:left;
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    padding:10px 14px;
+    border-bottom:1px solid var(--line);
+    background:var(--line-soft);
+  }
+  .month-table{margin-bottom:8px;}
+  tbody tr{border-bottom:1px solid var(--line-soft);}
+  tbody tr:last-child{border-bottom:none;}
+  tbody tr:hover{background:#FAFBFA;}
+  td{padding:13px 14px;font-size:14px;vertical-align:top;line-height:1.45;}
+  td.date-cell{white-space:nowrap;font-weight:600;color:var(--primary);width:90px;}
+  td.event-cell{width:220px;}
+  .event-name{font-weight:600;color:var(--ink);margin-bottom:5px;}
+  .tag-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+  .tag{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-size:11.5px;
+    padding:3px 9px;
+    border-radius:100px;
+    font-weight:600;
+  }
+  .scope-tag{
+    font-size:11px;
+    color:var(--ink-soft);
+    border:1px solid var(--line);
+    padding:2px 8px;
+    border-radius:100px;
+  }
+  td.angle-cell{color:var(--ink-soft);max-width:340px;}
+  td.format-cell{color:var(--ink-soft);width:190px;}
+  td.status-cell{width:150px;}
+  select.status-select{
+    width:100%;
+    font-family:inherit;
+    font-size:12.5px;
+    font-weight:600;
+    padding:6px 8px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    cursor:pointer;
+  }
+  .del-btn{
+    background:none;border:none;color:var(--ink-soft);cursor:pointer;
+    font-size:12px;padding:4px 6px;border-radius:6px;
+  }
+  .del-btn:hover{background:var(--coral-bg);color:var(--coral);}
+  td.actions-cell{width:36px;text-align:right;}
+
+  .empty{
+    text-align:center;padding:50px 20px;color:var(--ink-soft);
+    background:var(--paper);border-radius:12px;border:1px dashed var(--line);
+    font-size:14px;
+  }
+
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(20,37,33,0.45);
+    display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;
+  }
+  .modal{
+    background:var(--paper);border-radius:16px;padding:26px;max-width:520px;width:100%;
+    box-shadow:0 12px 40px rgba(0,0,0,0.2);
+  }
+  .modal h2{font-family:'Fraunces',serif;font-weight:500;font-size:21px;margin:0 0 18px;color:var(--primary);}
+  .field{margin-bottom:13px;}
+  .field label{display:block;font-size:12.5px;color:var(--ink-soft);margin-bottom:5px;font-weight:600;}
+  .field input, .field select, .field textarea{
+    width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;
+    font-family:inherit;font-size:14px;color:var(--ink);background:var(--bg);
+  }
+  .field textarea{resize:vertical;min-height:60px;}
+  .field-row{display:flex;gap:12px;}
+  .field-row .field{flex:1;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+  .btn-secondary{
+    background:none;border:1px solid var(--line);color:var(--ink-soft);
+    padding:9px 16px;border-radius:9px;cursor:pointer;font-family:inherit;font-size:14px;
+  }
+
+  footer{margin-top:36px;text-align:center;font-size:12.5px;color:var(--ink-soft);}
+  footer button{background:none;border:none;color:var(--coral);text-decoration:underline;cursor:pointer;font-family:inherit;font-size:12.5px;}
+
+  @media (max-width: 860px){
+    table, thead, tbody, tr, td{display:block;width:100%;}
+    thead{display:none;}
+    tbody tr{padding:14px;border-radius:10px;margin-bottom:10px;border:1px solid var(--line-soft);}
+    td{padding:4px 0;}
+    td.date-cell{font-size:13px;}
+    td.actions-cell{text-align:left;}
+    .field-row{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div>
+      <h1>Calendrier éditorial LinkedIn — DME</h1>
+      <p>Dates clés du secteur propreté, hygiène et RSE à exploiter pour la communication LinkedIn de l'entreprise.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="num" id="statTotal">–</span><span class="label">événements</span></div>
+      <div class="stat"><span class="num" id="statPlanned">–</span><span class="label">planifiés</span></div>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="search-row">
+      <input type="text" id="search" placeholder="Rechercher un événement, une thématique...">
+      <button class="add-btn" id="openAdd">+ Ajouter un événement</button>
+    </div>
+    <div class="chip-rows">
+      <div class="chip-row">
+        <span class="row-label">Mois</span>
+        <div id="monthChips"></div>
+      </div>
+      <div class="chip-row">
+        <span class="row-label">Thème</span>
+        <div id="categoryChips"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="content"></div>
+
+  <footer>
+    Les données ajoutées et les statuts sont enregistrés automatiquement sur cet appareil.
+    <button id="resetData">Réinitialiser mes ajouts</button>
+  </footer>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop" style="display:none;">
+  <div class="modal">
+    <h2>Ajouter un événement</h2>
+    <div class="field-row">
+      <div class="field">
+        <label>Date / Période</label>
+        <input type="text" id="f-date" placeholder="ex. 12 avril">
+      </div>
+      <div class="field">
+        <label>Mois</label>
+        <select id="f-month">
+          <option value="1">Janvier</option><option value="2">Février</option>
+          <option value="3">Mars</option><option value="4">Avril</option>
+          <option value="5">Mai</option><option value="6">Juin</option>
+          <option value="7">Juillet</option><option value="8">Août</option>
+          <option value="9">Septembre</option><option value="10">Octobre</option>
+          <option value="11">Novembre</option><option value="12">Décembre</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Événement</label>
+      <input type="text" id="f-event" placeholder="Nom de l'événement">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Typologie</label>
+        <input type="text" id="f-type" placeholder="ex. RSE & Écologie">
+      </div>
+      <div class="field">
+        <label>Portée</label>
+        <select id="f-scope">
+          <option value="Monde">Monde</option>
+          <option value="Europe">Europe</option>
+          <option value="France">France</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Angle éditorial LinkedIn</label>
+      <textarea id="f-angle" placeholder="Comment DME peut traiter le sujet"></textarea>
+    </div>
+    <div class="field">
+      <label>Format recommandé</label>
+      <input type="text" id="f-format" placeholder="ex. Carrousel, Vidéo courte...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="cancelAdd">Annuler</button>
+      <button class="add-btn" id="confirmAdd">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const MONTH_NAMES = ["","Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+
+const CATEGORY_RULES = [
+  { key:"rse", label:"RSE & Écologie", color:"mint", match:/rse|déchet|écolog|chimie|qai|numérique|zéro déchet/i },
+  { key:"hygiene", label:"Hygiène & Prévention", color:"blue", match:/hygiène|santé|prévention/i },
+  { key:"rh", label:"RH & Marque employeur", color:"coral", match:/rh|marque employeur|ergonomie|inclusion|diversité|bien-être/i },
+  { key:"salon", label:"Salons professionnels", color:"amber", match:/salon|congrès/i },
+];
+
+function getCategory(typologie){
+  for(const r of CATEGORY_RULES){ if(r.match.test(typologie)) return r; }
+  return { key:"autre", label:"Autre", color:"mint" };
+}
+
+function getScope(eventName, explicit){
+  if(explicit) return explicit;
+  if(/mondiale|internationale/i.test(eventName)) return "Monde";
+  if(/nationale/i.test(eventName)) return "France";
+  if(/européenne/i.test(eventName)) return "Europe";
+  return "Monde";
+}
+
+const BASE_EVENTS = [
+  { id:"b0", date:"8 mars", month:3, event:"Journée internationale des droits des femmes", typologie:"RSE & Diversité", angle:"Mettre en avant les femmes qui font DME au quotidien — agents, encadrantes, dirigeantes — dans un secteur souvent perçu comme technique et masculin alors que la propreté emploie une majorité de femmes : parcours, évolution de carrière et mixité des équipes.", format:"Portraits croisés / Témoignages courts", scope:"Monde" },
+  { id:"b1", date:"18 mars", month:3, event:"Journée mondiale du recyclage", typologie:"RSE & Déchets", angle:"Focus sur le tri sélectif sur site et le recyclage des bidons/emballages plastiques", format:"Carrousel (3 bonnes pratiques de tri)" },
+  { id:"b2", date:"21 mars", month:3, event:"Digital Cleanup Day", typologie:"RSE Numérique", angle:"Nettoyage des boîtes mails, serveurs et sobriété numérique en entreprise", format:"Sondage ou visuel simple" },
+  { id:"b3", date:"22 mars", month:3, event:"Journée mondiale de l'eau", typologie:"Éco-responsabilité", angle:"Comment réduire la consommation d'eau grâce aux nouvelles méthodes de lavage", format:"Chiffres clés / Infographie" },
+  { id:"b4", date:"Mars (tous les deux ans)", month:3, event:"Salon Europropre (Paris)", typologie:"Salon Pro", angle:"Présence au salon, veille sur les innovations matériel et rencontres partenaires", format:"Photos terrain / Vidéo courte" },
+  { id:"b5", date:"Mars (date variable)", month:3, event:"Salon CFIA (Rennes)", typologie:"Salon Pro", angle:"Focus hygiène industrielle, agroalimentaire et protocoles de désinfection", format:"Retour d'expérience / Synthèse texte" },
+  { id:"b6", date:"7 avril", month:4, event:"Journée mondiale de la santé", typologie:"Hygiène & Santé", angle:"Le bionettoyage comme premier rempart sanitaire en milieu professionnel", format:"Témoignage d'un agent ou expert" },
+  { id:"b7", date:"22 avril", month:4, event:"Journée de la Terre", typologie:"RSE & Chimie", angle:"Remplacement des produits corrosifs par des alternatives écolabellisées ou biotechnologiques", format:"Avant / Après ou Comparatif produit" },
+  { id:"b8", date:"28 avril", month:4, event:"Journée mondiale de la santé et sécurité au travail", typologie:"Ergonomie & RH", angle:"Prévention des TMS, matériel léger et équipements de protection adaptés", format:"Carrousel gestes & postures" },
+  { id:"b8b", date:"1er mai", month:5, event:"Journée internationale des travailleurs", typologie:"Marque employeur", angle:"Reconnaissance du travail des agents de propreté et d'hygiène, souvent invisible mais essentiel au bon fonctionnement des sites clients.", format:"Post de remerciement / Mise en lumière métier" },
+  { id:"b9", date:"5 mai", month:5, event:"Journée mondiale de l'hygiène des mains", typologie:"Prévention", angle:"Protocoles d'hygiène et distribution de savon/gel dans les espaces collectifs", format:"Visuel informatif + conseils rapides" },
+  { id:"b10", date:"Mai / Juin", month:5, event:"Congrès national de la SF2H", typologie:"Salon / Congrès", angle:"Veille hospitalière : bio-nettoyage et lutte contre les infections nosocomiales", format:"Synthèse de tendances sectorielles" },
+  { id:"b11", date:"Mi-Juin", month:6, event:"Semaine de la QVCT", typologie:"RH & Bien-être", angle:"Organisation du travail, valorisation des équipes et ergonomie au quotidien", format:"Post coulisses / Interview collaborateur" },
+  { id:"b12", date:"20 juin", month:6, event:"Journée internationale des agents de propreté", typologie:"Marque employeur", angle:"Valorisation et reconnaissance des équipes de terrain, travail en continu", format:"Portrait photo d'équipe + remerciements" },
+  { id:"b13", date:"Fin Juillet / Début Août", month:7, event:"Jour du dépassement de la Terre", typologie:"RSE / Écologie", angle:"Sobriété, dosage précis des consommables pour limiter l'empreinte environnementale", format:"Post réflexif avec 1 engagement concret" },
+  { id:"b14", date:"7 septembre", month:9, event:"Journée internationale de l'air pur", typologie:"QAI & Écologie", angle:"Qualité de l'air intérieur : impact des produits d'entretien sans COV nocifs", format:"Infographie explicative" },
+  { id:"b15", date:"3e samedi de Septembre", month:9, event:"World Cleanup Day", typologie:"Action RSE", angle:"Organisation ou participation d'une équipe à une collecte de déchets", format:"Galerie photos de l'action collective" },
+  { id:"b16", date:"18 Sept. – 8 Oct.", month:9, event:"Semaine européenne du développement durable", typologie:"RSE Globale", angle:"Bilan des actions environnementales et démarches durables de l'entreprise", format:"Série de 2 carrousels thématiques" },
+  { id:"b16b", date:"1er octobre", month:10, event:"Journée internationale des personnes âgées", typologie:"RSE & Inclusion", angle:"Protocoles d'hygiène et de bionettoyage adaptés aux EHPAD et résidences seniors, et valorisation des équipes dédiées à ces publics fragiles.", format:"Témoignage terrain / Focus métier" },
+  { id:"b16c", date:"7 octobre", month:10, event:"Journée mondiale du travail décent", typologie:"RSE & Droits sociaux", angle:"Engagement social de DME envers ses agents : conditions de travail, formation et évolution professionnelle dans un métier souvent peu visible.", format:"Post d'engagement / Chiffres clés RH" },
+  { id:"b16d", date:"10 octobre", month:10, event:"Journée mondiale de la santé mentale", typologie:"RH & Bien-être", angle:"Prévention de l'épuisement professionnel et accompagnement des équipes terrain, notamment celles en horaires décalés.", format:"Post sensibilisation / Ressources internes" },
+  { id:"b17", date:"14 octobre", month:10, event:"Journée nationale de la qualité de l'air", typologie:"Prévention", angle:"Bonnes pratiques d'aération et choix des consommables d'entretien", format:"Checklist téléchargeable ou carrousel" },
+  { id:"b18", date:"15 octobre", month:10, event:"Journée mondiale du lavage des mains", typologie:"Hygiène", angle:"Sensibilisation grand public et tertiaire à l'hygiène quotidienne", format:"Vidéo courte démonstrative / Quiz" },
+  { id:"b19", date:"Automne", month:10, event:"Salons Préventica / ExpoProtection", typologie:"Salon Pro", angle:"Découverte des dernières innovations en ergonomie, sécurité et EPI", format:"Debrief vidéo / Photos stands" },
+  { id:"b20", date:"3e semaine de Novembre", month:11, event:"Semaine du handicap (SEEPH)", typologie:"RSE & Inclusion", angle:"Insertion, accessibilité et adaptation des postes de travail", format:"Témoignage ou engagement d'entreprise" },
+  { id:"b21", date:"19 novembre", month:11, event:"Journée mondiale des toilettes", typologie:"Hygiène & Services", angle:"Maintenance, propreté et image de marque liées aux blocs sanitaires", format:"Post pédagogique (focus standard qualité)" },
+  { id:"b22", date:"Fin Novembre", month:11, event:"Semaine de la réduction des déchets (SERD)", typologie:"RSE & Zéro Déchet", angle:"Systèmes de recharge, dosage concentré et réduction des emballages à usage unique", format:"Étude de cas / Chiffres d'économies de matière" },
+  { id:"b23", date:"3 décembre", month:12, event:"Journée internationale des personnes handicapées", typologie:"RSE & Inclusion", angle:"Accessibilité des postes de travail, adaptation du matériel et maintien dans l'emploi des collaborateurs en situation de handicap chez DME.", format:"Témoignage collaborateur / Focus adaptation de poste" },
+  { id:"b24", date:"5 décembre", month:12, event:"Journée internationale des volontaires", typologie:"RSE & Engagement", angle:"Valorisation des engagements bénévoles ou associatifs des collaborateurs DME en dehors du cadre professionnel.", format:"Post portrait / Mise en avant d'une action solidaire" },
+  { id:"b25", date:"10 décembre", month:12, event:"Journée mondiale des droits de l'homme", typologie:"RSE & Éthique", angle:"Conditions de travail décentes et respect des droits des agents de terrain, un enjeu central et souvent invisibilisé dans le secteur de la propreté.", format:"Post d'engagement / Rappel de la charte éthique" },
+];
+
+let customEvents = [];
+let statuses = {};
+let activeMonth = "all";
+let activeCategory = "all";
+let searchTerm = "";
+
+const STORAGE_KEY = "dme-editorial-calendar";
+
+async function loadData(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY);
+    if(res && res.value){
+      const parsed = JSON.parse(res.value);
+      customEvents = parsed.customEvents || [];
+      statuses = parsed.statuses || {};
+    }
+  }catch(e){
+    // no saved data yet, that's fine
+  }
+  render();
+}
+
+async function saveData(){
+  try{
+    await window.storage.set(STORAGE_KEY, JSON.stringify({ customEvents, statuses }));
+  }catch(e){
+    console.error("Erreur de sauvegarde", e);
+  }
+}
+
+function allEvents(){
+  return [...BASE_EVENTS, ...customEvents];
+}
+
+function renderChips(){
+  const monthChips = document.getElementById("monthChips");
+  const usedMonths = [...new Set(allEvents().map(e => e.month))].sort((a,b)=>a-b);
+  monthChips.innerHTML = "";
+  const allChip = document.createElement("button");
+  allChip.className = "chip" + (activeMonth === "all" ? " active" : "");
+  allChip.textContent = "Tous";
+  allChip.onclick = () => { activeMonth = "all"; render(); };
+  monthChips.appendChild(allChip);
+  usedMonths.forEach(m => {
+    const c = document.createElement("button");
+    c.className = "chip" + (activeMonth === m ? " active" : "");
+    c.textContent = MONTH_NAMES[m];
+    c.onclick = () => { activeMonth = m; render(); };
+    monthChips.appendChild(c);
+  });
+
+  const categoryChips = document.getElementById("categoryChips");
+  categoryChips.innerHTML = "";
+  const allCat = document.createElement("button");
+  allCat.className = "chip" + (activeCategory === "all" ? " active" : "");
+  allCat.textContent = "Tous";
+  allCat.onclick = () => { activeCategory = "all"; render(); };
+  categoryChips.appendChild(allCat);
+  CATEGORY_RULES.forEach(r => {
+    const c = document.createElement("button");
+    c.className = "chip" + (activeCategory === r.key ? " active" : "");
+    c.textContent = r.label;
+    c.onclick = () => { activeCategory = r.key; render(); };
+    categoryChips.appendChild(c);
+  });
+}
+
+function statusPillColor(status){
+  if(status === "Publié") return "mint";
+  if(status === "Planifié") return "blue";
+  return "amber";
+}
+
+function render(){
+  renderChips();
+
+  let events = allEvents();
+
+  if(activeMonth !== "all") events = events.filter(e => e.month === activeMonth);
+  if(activeCategory !== "all") events = events.filter(e => getCategory(e.typologie).key === activeCategory);
+  if(searchTerm){
+    const t = searchTerm.toLowerCase();
+    events = events.filter(e =>
+      e.event.toLowerCase().includes(t) ||
+      e.typologie.toLowerCase().includes(t) ||
+      e.angle.toLowerCase().includes(t)
+    );
+  }
+
+  document.getElementById("statTotal").textContent = allEvents().length;
+  const plannedCount = allEvents().filter(e => statuses[e.id] === "Planifié" || statuses[e.id] === "Publié").length;
+  document.getElementById("statPlanned").textContent = plannedCount;
+
+  const content = document.getElementById("content");
+  content.innerHTML = "";
+
+  if(events.length === 0){
+    content.innerHTML = '<div class="empty">Aucun événement ne correspond à ta recherche.</div>';
+    return;
+  }
+
+  const byMonth = {};
+  events.forEach(e => { (byMonth[e.month] = byMonth[e.month] || []).push(e); });
+
+  Object.keys(byMonth).sort((a,b)=>a-b).forEach(m => {
+    const group = document.createElement("div");
+    group.className = "month-group";
+
+    const head = document.createElement("div");
+    head.className = "month-head";
+    head.innerHTML = `<span class="num">${String(m).padStart(2,"0")}</span><span class="name">${MONTH_NAMES[m]}</span><span class="rule"></span>`;
+    group.appendChild(head);
+
+    const table = document.createElement("table");
+    table.className = "month-table";
+    table.innerHTML = `
+      <thead><tr>
+        <th>Date</th><th>Événement</th><th>Angle éditorial</th><th>Format</th><th>Statut</th><th></th>
+      </tr></thead>
+      <tbody></tbody>
+    `;
+    const tbody = table.querySelector("tbody");
+
+    byMonth[m].forEach(e => {
+      const cat = getCategory(e.typologie);
+      const scope = getScope(e.event, e.scope);
+      const status = statuses[e.id] || "À planifier";
+      const isCustom = e.id.startsWith("custom-");
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="date-cell">${e.date}</td>
+        <td class="event-cell">
+          <div class="event-name">${e.event}</div>
+          <div class="tag-row">
+            <span class="tag" style="background:var(--${cat.color}-bg);color:var(--${cat.color === 'mint' ? 'primary' : cat.color});">${e.typologie}</span>
+            <span class="scope-tag">${scope}</span>
+          </div>
+        </td>
+        <td class="angle-cell">${e.angle}</td>
+        <td class="format-cell">${e.format}</td>
+        <td class="status-cell">
+          <select class="status-select" data-id="${e.id}" style="background:var(--${statusPillColor(status)}-bg);">
+            <option${status==="À planifier"?" selected":""}>À planifier</option>
+            <option${status==="Planifié"?" selected":""}>Planifié</option>
+            <option${status==="Publié"?" selected":""}>Publié</option>
+          </select>
+        </td>
+        <td class="actions-cell">${isCustom ? `<button class="del-btn" data-id="${e.id}" title="Supprimer">✕</button>` : ""}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    group.appendChild(table);
+    content.appendChild(group);
+  });
+
+  content.querySelectorAll(".status-select").forEach(sel => {
+    sel.addEventListener("change", async (ev) => {
+      const id = ev.target.dataset.id;
+      statuses[id] = ev.target.value;
+      await saveData();
+      render();
+    });
+  });
+  content.querySelectorAll(".del-btn").forEach(btn => {
+    btn.addEventListener("click", async (ev) => {
+      const id = ev.target.dataset.id;
+      customEvents = customEvents.filter(e => e.id !== id);
+      delete statuses[id];
+      await saveData();
+      render();
+    });
+  });
+}
+
+document.getElementById("search").addEventListener("input", (e) => {
+  searchTerm = e.target.value;
+  render();
+});
+
+const modalBackdrop = document.getElementById("modalBackdrop");
+document.getElementById("openAdd").addEventListener("click", () => { modalBackdrop.style.display = "flex"; });
+document.getElementById("cancelAdd").addEventListener("click", () => { modalBackdrop.style.display = "none"; });
+
+document.getElementById("confirmAdd").addEventListener("click", async () => {
+  const date = document.getElementById("f-date").value.trim();
+  const month = parseInt(document.getElementById("f-month").value, 10);
+  const event = document.getElementById("f-event").value.trim();
+  const typologie = document.getElementById("f-type").value.trim() || "RSE";
+  const scope = document.getElementById("f-scope").value;
+  const angle = document.getElementById("f-angle").value.trim();
+  const format = document.getElementById("f-format").value.trim();
+
+  if(!date || !event){
+    alert("Merci de renseigner au moins une date et un nom d'événement.");
+    return;
+  }
+
+  customEvents.push({
+    id: "custom-" + Date.now(),
+    date, month, event, typologie, angle, format, scope
+  });
+
+  await saveData();
+  modalBackdrop.style.display = "none";
+  document.querySelectorAll(".modal input, .modal textarea").forEach(i => i.value = "");
+  render();
+});
+
+document.getElementById("resetData").addEventListener("click", async () => {
+  if(confirm("Supprimer tous tes événements ajoutés et statuts ? Cette action est irréversible.")){
+    customEvents = [];
+    statuses = {};
+    await saveData();
+    render();
+  }
+});
+
+loadData();
+</script>
+</body>
+</html>
