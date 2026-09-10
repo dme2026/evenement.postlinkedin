@@ -382,23 +382,23 @@ let searchTerm = "";
 
 const STORAGE_KEY = "dme-editorial-calendar";
 
-async function loadData(){
+function loadData(){
   try{
-    const res = await window.storage.get(STORAGE_KEY);
-    if(res && res.value){
-      const parsed = JSON.parse(res.value);
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
       customEvents = parsed.customEvents || [];
       statuses = parsed.statuses || {};
     }
   }catch(e){
-    // no saved data yet, that's fine
+    console.error("Erreur de chargement", e);
   }
   render();
 }
 
-async function saveData(){
+function saveData(){
   try{
-    await window.storage.set(STORAGE_KEY, JSON.stringify({ customEvents, statuses }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ customEvents, statuses }));
   }catch(e){
     console.error("Erreur de sauvegarde", e);
   }
@@ -532,19 +532,19 @@ function render(){
   });
 
   content.querySelectorAll(".status-select").forEach(sel => {
-    sel.addEventListener("change", async (ev) => {
+    sel.addEventListener("change", (ev) => {
       const id = ev.target.dataset.id;
       statuses[id] = ev.target.value;
-      await saveData();
+      saveData();
       render();
     });
   });
   content.querySelectorAll(".del-btn").forEach(btn => {
-    btn.addEventListener("click", async (ev) => {
+    btn.addEventListener("click", (ev) => {
       const id = ev.target.dataset.id;
       customEvents = customEvents.filter(e => e.id !== id);
       delete statuses[id];
-      await saveData();
+      saveData();
       render();
     });
   });
@@ -559,7 +559,7 @@ const modalBackdrop = document.getElementById("modalBackdrop");
 document.getElementById("openAdd").addEventListener("click", () => { modalBackdrop.style.display = "flex"; });
 document.getElementById("cancelAdd").addEventListener("click", () => { modalBackdrop.style.display = "none"; });
 
-document.getElementById("confirmAdd").addEventListener("click", async () => {
+document.getElementById("confirmAdd").addEventListener("click", () => {
   const date = document.getElementById("f-date").value.trim();
   const month = parseInt(document.getElementById("f-month").value, 10);
   const event = document.getElementById("f-event").value.trim();
@@ -578,17 +578,17 @@ document.getElementById("confirmAdd").addEventListener("click", async () => {
     date, month, event, typologie, angle, format, scope
   });
 
-  await saveData();
+  saveData();
   modalBackdrop.style.display = "none";
   document.querySelectorAll(".modal input, .modal textarea").forEach(i => i.value = "");
   render();
 });
 
-document.getElementById("resetData").addEventListener("click", async () => {
+document.getElementById("resetData").addEventListener("click", () => {
   if(confirm("Supprimer tous tes événements ajoutés et statuts ? Cette action est irréversible.")){
     customEvents = [];
     statuses = {};
-    await saveData();
+    saveData();
     render();
   }
 });
